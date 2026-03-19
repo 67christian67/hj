@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epstein Clicker - Little Epstein Edition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #0f0;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #game { max-width: 900px; margin: 0 auto; padding: 20px; }
+        #epstein {
+            width: 260px; height: 260px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Jeffrey_Epstein_mugshot.jpg/800px-Jeffrey_Epstein_mugshot.jpg') center/cover;
+            border-radius: 50%;
+            margin: 20px auto;
+            cursor: pointer;
+            box-shadow: 0 0 40px #f00;
+            transition: transform 0.08s;
+            border: 6px solid #f00;
+            position: relative;
+        }
+        #epstein:active { transform: scale(0.88); }
+        .little-epstein {
+            position: absolute;
+            width: 32px; height: 32px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Jeffrey_Epstein_mugshot.jpg/800px-Jeffrey_Epstein_mugshot.jpg') center/cover;
+            border-radius: 50%;
+            border: 2px solid #ff0;
+            box-shadow: 0 0 12px #ff0;
+            animation: wiggle 1.5s infinite alternate;
+            pointer-events: none;
+        }
+        @keyframes wiggle {
+            from { transform: rotate(-12deg) scale(1); }
+            to { transform: rotate(12deg) scale(1.1); }
+        }
+        #count { font-size: 3.2em; margin: 10px; text-shadow: 0 0 15px #0f0; }
+        #eps { font-size: 1.4em; color: #0ff; }
+        .shop { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
+        .item {
+            background: #222; border: 2px solid #0f0; padding: 15px; width: 190px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .item:hover { background: #333; border-color: #ff0; transform: translateY(-6px); }
+        .item-name { font-size: 1.35em; margin-bottom: 5px; }
+        .item-cost { color: #ff0; }
+        .item-owned { color: #0ff; font-size: 0.9em; }
+        #stats { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.85); padding: 12px; border: 1px solid #0f0; font-size: 0.9em; }
+        .particle {
+            position: absolute; font-size: 22px; color: #ff0; pointer-events: none;
+            animation: flyUp 1.1s forwards; text-shadow: 0 0 10px #f00;
+        }
+        @keyframes flyUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120px); opacity: 0; } }
+        .golden {
+            position: absolute; width: 60px; height: 60px;
+            background: radial-gradient(circle, #ff0, #f80); border-radius: 50%;
+            box-shadow: 0 0 40px #ff0; cursor: pointer; animation: goldenPulse 1.2s infinite;
+            border: 4px solid #f00;
+        }
+        @keyframes goldenPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+        h1 { color: #f00; text-shadow: 0 0 25px #f00; }
+        .warning { color: #f80; font-size: 0.85em; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <h1>🕵️‍♂️ EPSTEIN CLICKER 🕵️‍♂️</h1>
+        <div class="warning">Click Big Epstein.<br>Buy buildings → they spawn **little Epstein's** that generate more Epstein's.<br>Watch for the rare Golden Epstein...</div>
+        
+        <div id="epstein"></div>
+        
+        <div id="count">0 Epstein's</div>
+        <div id="eps">0 Epstein's per second</div>
+        
+        <div class="shop" id="shop"></div>
+    </div>
+    
+    <div id="stats">
+        Total clicks: <span id="totalClicked">0</span><br>
+        Epstein's clicked: <span id="epsteinsClicked">0</span>
+    </div>
+
+    <script>
+        let epsteins = 0;
+        let totalEpsteins = 0;
+        let clickValue = 1;
+        let epsteinsPerSecond = 0;
+        let totalClicked = 0;
+        let epsteinsClicked = 0;
+        
+        let buildings = [
+            { name: "Little Black Book", baseCost: 15, cost: 15, production: 0.6, owned: 0, emoji: "📖", color: "#0f0" },
+            { name: "Lolita Express", baseCost: 100, cost: 100, production: 5, owned: 0, emoji: "✈️", color: "#0ff" },
+            { name: "Private Island", baseCost: 550, cost: 550, production: 25, owned: 0, emoji: "🏝️", color: "#ff0" },
+            { name: "Mossad Agent", baseCost: 2200, cost: 2200, production: 90, owned: 0, emoji: "🕵️", color: "#f0f" },
+            { name: "Elite Client", baseCost: 12000, cost: 12000, production: 450, owned: 0, emoji: "💼", color: "#f80" },
+            { name: "Hidden Camera Network", baseCost: 65000, cost: 65000, production: 2500, owned: 0, emoji: "📹", color: "#f00" }
+        ];
+        
+        const epsteinEl = document.getElementById('epstein');
+        const countEl = document.getElementById('count');
+        const epsEl = document.getElementById('eps');
+        const shopEl = document.getElementById('shop');
+        const totalClickedEl = document.getElementById('totalClicked');
+        const epsteinsClickedEl = document.getElementById('epsteinsClicked');
+        
+        let littleEpsteins = []; // {el, production}
+        
+        function createShop() {
+            shopEl.innerHTML = '';
+            buildings.forEach((b, i) => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="item-name">${b.emoji} ${b.name}</div>
+                    <div class="item-cost">Cost: <span id="cost-${i}">${Math.floor(b.cost)}</span></div>
+                    <div class="item-owned">Owned: <span id="owned-${i}">${b.owned}</span> | +${b.production}/s</div>
+                `;
+                item.onclick = () => buyBuilding(i);
+                shopEl.appendChild(item);
+            });
+        }
+        
+        function updateShop() {
+            buildings.forEach((b, i) => {
+                const costEl = document.getElementById(`cost-${i}`);
+                const ownedEl = document.getElementById(`owned-${i}`);
+                if (costEl) costEl.textContent = Math.floor(b.cost);
+                if (ownedEl) ownedEl.textContent = b.owned;
+                
+                const item = shopEl.children[i];
+                if (item) item.style.borderColor = epsteins >= b.cost ? '#0f0' : '#555';
+            });
+        }
+        
+        function buyBuilding(i) {
+            const b = buildings[i];
+            if (epsteins >= b.cost) {
+                epsteins -= b.cost;
+                b.owned++;
+                b.cost = Math.floor(b.baseCost * Math.pow(1.16, b.owned));
+                
+                // Spawn a new little Epstein on the big one
+                spawnLittleEpstein(b);
+                
+                calculateEPS();
+                updateDisplay();
+                updateShop();
+                createParticle(epsteinEl, `+${b.emoji}`, b.color);
+            }
+        }
+        
+        function spawnLittleEpstein(building) {
+            const little = document.createElement('div');
+            little.className = 'little-epstein';
+            little.style.left = (30 + Math.random() * 200) + 'px';
+            little.style.top = (40 + Math.random() * 160) + 'px';
+            little.style.animationDuration = (1 + Math.random() * 1.2) + 's';
+            
+            epsteinEl.appendChild(little);
+            littleEpsteins.push({el: little, production: building.production / 8}); // they contribute a bit extra visually
+        }
+        
+        function calculateEPS() {
+            epsteinsPerSecond = buildings.reduce((sum, b) => sum + b.production * b.owned, 0);
+        }
+        
+        function updateDisplay() {
+            countEl.textContent = Math.floor(epsteins).toLocaleString() + " Epstein's";
+            epsEl.textContent = epsteinsPerSecond.toFixed(1) + " Epstein's per second";
+            totalClickedEl.textContent = totalClicked.toLocaleString();
+            epsteinsClickedEl.textContent = epsteinsClicked.toLocaleString();
+        }
+        
+        function clickEpstein(e) {
+            epsteins += clickValue;
+            totalEpsteins += clickValue;
+            totalClicked++;
+            epsteinsClicked += clickValue;
+            
+            epsteinEl.style.transform = 'scale(1.25)';
+            setTimeout(() => epsteinEl.style.transform = 'scale(1)', 70);
+            
+            const rect = epsteinEl.getBoundingClientRect();
+            const x = e ? e.clientX : rect.left + rect.width/2 + Math.random()*60 - 30;
+            const y = e ? e.clientY : rect.top + rect.height/2 + Math.random()*60 - 30;
+            
+            createParticleAt(x, y, `+${clickValue}`, '#ff0');
+            
+            // Rare chance for a tiny head particle
+            if (Math.random() < 0.3) {
+                createParticleAt(x + 20, y - 20, '🕵️‍♂️', '#0ff');
+            }
+            
+            updateDisplay();
+        }
+        
+        function createParticleAt(x, y, text, color) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            p.style.color = color;
+            p.textContent = text;
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1300);
+        }
+        
+        function createParticle(el, text, color) {
+            const rect = el.getBoundingClientRect();
+            createParticleAt(rect.left + Math.random()*rect.width, rect.top + 50 + Math.random()*100, text, color);
+        }
+        
+        function spawnGoldenEpstein() {
+            if (Math.random() < 0.008 && document.querySelectorAll('.golden').length === 0) { // rare
+                const gold = document.createElement('div');
+                gold.className = 'golden';
+                const rect = epsteinEl.getBoundingClientRect();
+                gold.style.left = (rect.left + 80 + Math.random()*100) + 'px';
+                gold.style.top = (rect.top + 60 + Math.random()*80) + 'px';
+                document.body.appendChild(gold);
+                
+                gold.onclick = () => {
+                    const bonus = Math.floor(epsteins * 0.15) + 250;
+                    epsteins += bonus;
+                    createParticleAt(gold.offsetLeft + 20, gold.offsetTop - 30, `+${bonus}!`, '#ff0');
+                    gold.remove();
+                    updateDisplay();
+                };
+                
+                setTimeout(() => { if (gold.parentNode) gold.remove(); }, 8500);
+            }
+        }
+        
+        function gameLoop() {
+            const now = Date.now();
+            if (!window.lastTime) window.lastTime = now;
+            const gain = epsteinsPerSecond * (now - window.lastTime) / 1000;
+            epsteins += gain;
+            totalEpsteins += gain;
+            window.lastTime = now;
+            
+            updateDisplay();
+            updateShop();
+            spawnGoldenEpstein();
+            
+            // occasional self-click from little ones
+            if (Math.random() < 0.03 && littleEpsteins.length > 0) {
+                const lucky = littleEpsteins[Math.floor(Math.random()*littleEpsteins.length)];
+                if (lucky.el.parentNode) {
+                    createParticleAt(
+                        lucky.el.getBoundingClientRect().left + 16,
+                        lucky.el.getBoundingClientRect().top + 10,
+                        '+🕵️‍♂️', '#0ff'
+                    );
+                }
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function saveGame() {
+            const save = { epsteins, totalEpsteins, clickValue, buildings: buildings.map(b => ({owned: b.owned, cost: b.cost})), totalClicked, epsteinsClicked };
+            localStorage.setItem('epsteinClickerV2', JSON.stringify(save));
+        }
+        
+        function loadGame() {
+            const saved = localStorage.getItem('epsteinClickerV2');
+            if (saved) {
+                const data = JSON.parse(saved);
+                epsteins = data.epsteins || 0;
+                totalEpsteins = data.totalEpsteins || 0;
+                clickValue = data.clickValue || 1;
+                totalClicked = data.totalClicked || 0;
+                epsteinsClicked = data.epsteinsClicked || 0;
+                
+                if (data.buildings) {
+                    data.buildings.forEach((sb, i) => {
+                        if (buildings[i]) {
+                            buildings[i].owned = sb.owned || 0;
+                            buildings[i].cost = sb.cost || buildings[i].baseCost;
+                        }
+                    });
+                }
+                calculateEPS();
+            }
+        }
+        
+        function init() {
+            loadGame();
+            createShop();
+            calculateEPS();
+            updateDisplay();
+            updateShop();
+            
+            // Spawn existing little ones on load
+            buildings.forEach(b => {
+                for (let i = 0; i < b.owned; i++) {
+                    if (Math.random() < 0.7) spawnLittleEpstein(b);
+                }
+            });
+            
+            epsteinEl.addEventListener('click', clickEpstein);
+            setInterval(saveGame, 8000);
+            setInterval(() => { if (Math.random() < 0.4) createParticle(epsteinEl, '🕵️‍♂️', '#0ff'); }, 4500);
+            
+            gameLoop();
+            
+            setTimeout(() => createParticle(epsteinEl, "the little ones are watching", "#f80"), 1200);
+        }
+        
+        window.onload = init;
+    </script>
+</body>
+</html>
