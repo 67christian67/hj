@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>VORTX</title>
+<title>VORTX • OFFICIAL MULTIVERSE ARCHIVE</title>
 <style>
   :root {
-    --neon: #67e8f9;
-    --purple: #c084fc;
-    --pink: #f472b6;
+    --neon-cyan: #67e8f9;
+    --neon-purple: #c084fc;
+    --neon-pink: #f472b6;
+    --deep-space: #0a0a1f;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -16,67 +17,103 @@
   body {
     height: 100vh;
     overflow: hidden;
-    background: #000;
+    background: radial-gradient(circle at center, #0a0a1f 0%, #000 80%);
     color: #eee;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     cursor: none;
     position: relative;
   }
+
+  /* Subtle vignette for official NASA-level depth */
+  body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  /* Top Official Header */
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 68px;
+    background: rgba(10,10,31,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(103,232,249,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 999;
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header .logo { font-weight: 900; font-size: 1.6rem; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); -webkit-background-clip: text; color: transparent; }
 
   /* Universes */
   .universe {
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 2.4s cubic-bezier(0.23,1,0.32,1);
+    transition: opacity 2.6s cubic-bezier(0.23,1,0.32,1);
     pointer-events: none;
   }
   .universe.active { opacity: 1; pointer-events: auto; }
 
   .stars { position: absolute; inset: 0; z-index: 1; }
 
-  /* Planets */
+  /* Planets - Ultra Premium */
   .planets { position: absolute; inset: 0; z-index: 3; }
   .planet-container {
     position: absolute;
     width: var(--size);
     height: var(--size);
     cursor: pointer;
-    transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1);
+    transition: all 0.8s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .planet-container:hover { transform: scale(1.4) rotate(12deg); }
+  .planet-container:hover { 
+    transform: scale(1.45) rotate(15deg); 
+    filter: brightness(1.15) drop-shadow(0 0 60px var(--neon-cyan));
+  }
   .planet {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 0 55px rgba(103,232,249,0.7),
-                0 0 100px rgba(192,132,252,0.5);
+    box-shadow: 0 0 60px rgba(103,232,249,0.8),
+                0 0 110px rgba(192,132,252,0.6),
+                inset 0 0 40px rgba(255,255,255,0.3);
   }
 
-  /* Black Hole - Now Interactive */
+  /* Black Hole - Singularity Level */
   .black-hole {
     position: absolute;
     left: 50%; top: 50%;
-    width: 380px; height: 380px;
+    width: 400px; height: 400px;
     transform: translate(-50%, -50%);
     background: url('https://svs.gsfc.nasa.gov/vis/a000000/a001400/a001419/black_hole_accretion_disk.jpg') center/cover;
     border-radius: 50%;
-    box-shadow: 0 0 200px #ffaa00, 0 0 400px #ff5500, inset 0 0 120px #111;
-    animation: bh-neon 6.5s infinite alternate ease-in-out;
+    box-shadow: 0 0 220px #ffaa00, 0 0 440px #ff5500, inset 0 0 140px #111;
+    animation: bh-ultra 6s infinite alternate ease-in-out;
     cursor: pointer;
-    transition: transform 0.4s;
+    transition: all 0.5s;
   }
-  .black-hole:hover { transform: translate(-50%, -50%) scale(1.12); }
-  @keyframes bh-neon {
-    from { box-shadow: 0 0 160px #ffaa00, 0 0 340px #ff5500; }
-    to   { box-shadow: 0 0 240px #ffaa00, 0 0 480px #ff5500; }
+  .black-hole:hover { 
+    transform: translate(-50%, -50%) scale(1.18) rotate(8deg); 
+    box-shadow: 0 0 300px #ffaa00, 0 0 600px #ffaa00;
+  }
+  @keyframes bh-ultra {
+    from { box-shadow: 0 0 180px #ffaa00, 0 0 380px #ff5500; }
+    to   { box-shadow: 0 0 260px #ffaa00, 0 0 520px #ff5500; }
   }
 
-  /* Neon Cursor */
+  /* Neon Cursor - Official Glow */
   .custom-cursor {
     position: fixed;
-    width: 44px; height: 44px;
+    width: 46px; height: 46px;
     pointer-events: none; z-index: 9999;
     transform: translate(-50%, -50%);
     mix-blend-mode: screen;
@@ -84,13 +121,13 @@
   .cursor-core {
     width: 100%; height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #fff, var(--neon), transparent 75%);
-    box-shadow: 0 0 45px var(--neon), 0 0 90px var(--purple);
-    animation: cursor-pulse 2.2s infinite ease-in-out;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--neon-cyan), transparent 78%);
+    box-shadow: 0 0 50px var(--neon-cyan), 0 0 100px var(--neon-purple);
+    animation: cursor-ultra 2s infinite ease-in-out;
   }
-  @keyframes cursor-pulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.45);} }
+  @keyframes cursor-ultra { 0%,100% {transform:scale(1);} 50% {transform:scale(1.48);} }
 
-  /* Content */
+  /* Main Content */
   .content {
     position: relative; z-index: 10;
     height: 100vh;
@@ -102,119 +139,149 @@
   .content > * { pointer-events: auto; }
 
   h1 {
-    font-size: clamp(5.2rem, 17vw, 13rem);
+    font-size: clamp(5.5rem, 18vw, 14rem);
     font-weight: 900;
-    letter-spacing: -0.08em;
+    letter-spacing: -0.09em;
     background: linear-gradient(90deg, #67e8f9, #a5b4fc, #c084fc, #f472b6);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     background-size: 400% 100%;
-    animation: title-neon 10s linear infinite;
-    text-shadow: 0 0 90px rgba(103,232,249,0.9);
+    animation: title-ultra 9s linear infinite;
+    text-shadow: 0 0 40px var(--neon-cyan),
+                 0 0 80px var(--neon-purple),
+                 0 0 140px rgba(244,114,182,0.6);
   }
-  @keyframes title-neon { 0% {background-position:0% 50%} 100% {background-position:400% 50%} }
+  @keyframes title-ultra { 0% {background-position:0% 50%} 100% {background-position:400% 50%} }
 
   .subtitle {
-    font-size: 1.55rem;
-    max-width: 860px;
-    opacity: 0.92;
-    line-height: 1.85;
-    margin: 1rem 0 2.5rem;
+    font-size: 1.65rem;
+    max-width: 920px;
+    opacity: 0.93;
+    line-height: 1.9;
+    margin: 1.2rem 0 3rem;
+    font-weight: 400;
   }
 
   .btn {
-    padding: 20px 48px;
-    font-size: 1.4rem;
-    background: rgba(103,232,249,0.08);
-    border: 3px solid var(--neon);
-    border-radius: 50px;
+    padding: 22px 52px;
+    font-size: 1.45rem;
+    font-weight: 600;
+    background: rgba(103,232,249,0.09);
+    border: 3px solid var(--neon-cyan);
+    border-radius: 60px;
     color: white;
     cursor: pointer;
-    transition: all 0.5s ease;
-    box-shadow: 0 0 40px rgba(103,232,249,0.6);
+    transition: all 0.6s cubic-bezier(0.23,1,0.32,1);
+    box-shadow: 0 0 50px rgba(103,232,249,0.7);
+    letter-spacing: 0.05em;
   }
   .btn:hover {
-    background: var(--neon);
+    background: var(--neon-cyan);
     color: #000;
-    transform: scale(1.12);
-    box-shadow: 0 0 80px #67e8f9;
+    transform: scale(1.15);
+    box-shadow: 0 0 90px var(--neon-cyan);
   }
 
-  /* Planet Info */
-  #planet-info {
+  /* Planet & Black Hole Info Panels */
+  #planet-info, #famous-modal {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.97);
+    background: rgba(3,4,20,0.96);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(16px);
   }
-  .info-box {
-    background: rgba(8,10,32,0.98);
-    border: 3px solid var(--neon);
-    border-radius: 30px;
-    padding: 3.2rem 3rem;
-    max-width: 700px;
-    width: 92%;
-    box-shadow: 0 0 140px rgba(103,232,249,0.8);
+  .info-box, .modal-content {
+    background: rgba(10,12,35,0.96);
+    border: 3px solid var(--neon-cyan);
+    border-radius: 32px;
+    padding: 3.5rem 3.2rem;
+    max-width: 740px;
+    width: 94%;
+    box-shadow: 0 0 160px rgba(103,232,249,0.85);
+    position: relative;
   }
   .info-box h2 {
-    font-size: 3.6rem;
-    color: var(--neon);
-    margin-bottom: 1.5rem;
-    text-shadow: 0 0 40px var(--neon);
+    font-size: 3.8rem;
+    color: var(--neon-cyan);
+    margin-bottom: 1.6rem;
+    text-shadow: 0 0 50px var(--neon-cyan);
   }
-  .info-box p { font-size: 1.4rem; line-height: 1.9; }
+  .info-box p { font-size: 1.45rem; line-height: 1.95; }
 
-  .close-btn {
-    position: absolute; top: 30px; right: 40px;
-    font-size: 3.5rem; color: #777; cursor: pointer;
-  }
-  .close-btn:hover { color: var(--neon); }
-
-  /* Famous Modal */
-  #famous-modal {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.97);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1001;
-  }
+  /* Famous Modal - Official Hall of Legends */
   .modal-content {
-    background: rgba(10,12,35,0.98);
-    border-radius: 30px;
-    max-width: 960px;
-    width: 94%;
-    max-height: 92vh;
+    max-width: 1080px;
+    padding: 3.5rem;
+    max-height: 94vh;
     overflow-y: auto;
-    padding: 3.5rem 3rem;
   }
   .modal-content h2 {
     text-align: center;
-    font-size: 3.4rem;
-    margin-bottom: 2.5rem;
-    color: var(--neon);
+    font-size: 3.6rem;
+    margin-bottom: 2.8rem;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    -webkit-background-clip: text;
+    color: transparent;
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-    gap: 1.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem;
   }
   .legend {
+    display: flex;
+    gap: 1.8rem;
     background: rgba(255,255,255,0.06);
     padding: 1.8rem;
-    border-radius: 20px;
-    border-left: 8px solid var(--neon);
+    border-radius: 24px;
+    border-left: 8px solid var(--neon-cyan);
+    transition: all 0.4s ease;
   }
-  .legend h3 { color: var(--purple); margin-bottom: 0.5rem; }
+  .legend:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 0 60px rgba(103,232,249,0.5);
+  }
+  .legend img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--neon-purple);
+    box-shadow: 0 0 30px rgba(192,132,252,0.6);
+  }
+  .legend .info {
+    flex: 1;
+  }
+  .legend h3 { 
+    font-size: 1.65rem; 
+    color: var(--neon-purple); 
+    margin-bottom: 0.3rem;
+  }
+  .legend small { opacity: 0.75; font-size: 1rem; }
+  .legend p { margin-top: 1rem; font-size: 1.1rem; line-height: 1.7; }
+
+  .close-btn {
+    position: absolute; top: 28px; right: 38px;
+    font-size: 3.8rem; color: #777; cursor: pointer;
+    transition: color 0.3s;
+  }
+  .close-btn:hover { color: var(--neon-cyan); }
 
   /* Particles */
-  #particles { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+  #particles { position: absolute; inset: 0; pointer-events: none; z-index: 7; }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- Official Header -->
+  <div class="header">
+    <div class="logo">VORTX</div>
+    <div>OFFICIAL MULTIVERSE ARCHIVE • 2026</div>
+  </div>
 
   <!-- Universes -->
   <div class="universe active" id="u1">
@@ -228,7 +295,7 @@
     <div class="black-hole" id="blackhole"></div>
   </div>
 
-  <!-- Particles Container -->
+  <!-- Particles -->
   <div id="particles"></div>
 
   <!-- Cursor -->
@@ -238,10 +305,10 @@
   <div class="content">
     <h1>VORTX</h1>
     <p class="subtitle">
-      Click the void to warp universes<br>
-      Click planets for deep dive • Click the black hole for singularity
+      The official gateway to the multiverse.<br>
+      Click space to travel • Click planets to explore • Click the black hole to enter the singularity
     </p>
-    <button class="btn" id="famous-btn">LEGENDARY ASTRONOMERS &amp; ASTROPHYSICISTS</button>
+    <button class="btn" id="famous-btn">HALL OF COSMIC LEGENDS</button>
   </div>
 
   <!-- Planet Info -->
@@ -253,25 +320,25 @@
     </div>
   </div>
 
-  <!-- Famous Modal -->
+  <!-- Famous Modal - Hall of Legends with Portraits -->
   <div id="famous-modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeFamousModal()" style="float:right;font-size:3.5rem;">×</span>
-      <h2>Legends of the Cosmos</h2>
+      <span class="close-btn" onclick="closeFamousModal()" style="float:right;">×</span>
+      <h2>HALL OF COSMIC LEGENDS</h2>
       <div class="grid" id="legends-grid"></div>
     </div>
   </div>
 
   <!-- Audio -->
-  <audio id="ambient" loop autoplay volume="0.25">
+  <audio id="ambient" loop autoplay volume="0.28">
     <source src="https://freesound.org/data/previews/612/612095_5674468-lq.mp3" type="audio/mpeg">
   </audio>
   <audio id="whoosh" src="https://freesound.org/data/previews/276/276952_5121236-lq.mp3"></audio>
   <audio id="burst" src="https://freesound.org/data/previews/387/387962_7256635-lq.mp3"></audio>
 
 <script>
-// ====================== DATA ======================
-const planetData = [
+// ====================== DATA WITH OFFICIAL PORTRAITS ======================
+const planetData = [ /* same as last version */ 
   {id:"mercury", name:"Mercury", size:"58", left:"10%", top:"16%", desc:"Smallest planet. Extreme heat by day, freezing by night. No atmosphere."},
   {id:"venus", name:"Venus", size:"85", left:"27%", top:"67%", desc:"Hottest planet in the Solar System. Toxic atmosphere and retrograde rotation."},
   {id:"earth", name:"Earth", size:"95", left:"41%", top:"23%", desc:"Our living blue home. The only known planet with life."},
@@ -283,15 +350,15 @@ const planetData = [
 ];
 
 const legends = [
-  {name:"Galileo Galilei", years:"1564–1642", note:"First to use a telescope for astronomy. Discovered Jupiter’s moons."},
-  {name:"Johannes Kepler", years:"1571–1630", note:"Discovered the three laws of planetary motion."},
-  {name:"Isaac Newton", years:"1643–1727", note:"Law of universal gravitation."},
-  {name:"Edwin Hubble", years:"1889–1953", note:"Proved the universe is expanding."},
-  {name:"Carl Sagan", years:"1934–1996", note:"Cosmos visionary and planetary science pioneer."},
-  {name:"Stephen Hawking", years:"1942–2018", note:"Revolutionized black hole physics."},
-  {name:"Vera Rubin", years:"1928–2016", note:"Provided key evidence for dark matter."},
-  {name:"Cecilia Payne-Gaposchkin", years:"1900–1979", note:"Discovered stars are mostly hydrogen and helium."},
-  {name:"Neil deGrasse Tyson", years:"1958–present", note:"Astrophysicist and legendary science communicator."}
+  {name:"Galileo Galilei", years:"1564–1642", note:"First to use a telescope for astronomy. Discovered Jupiter’s moons and Venus phases.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Justus_Sustermans_-_Portrait_of_Galileo_Galilei.jpg/800px-Justus_Sustermans_-_Portrait_of_Galileo_Galilei.jpg"},
+  {name:"Johannes Kepler", years:"1571–1630", note:"Discovered the three laws of planetary motion.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Portrait_of_Johannes_Kepler.jpg/800px-Portrait_of_Johannes_Kepler.jpg"},
+  {name:"Isaac Newton", years:"1643–1727", note:"Formulated the law of universal gravitation.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Portrait_of_Sir_Isaac_Newton%2C_1689.jpg/800px-Portrait_of_Sir_Isaac_Newton%2C_1689.jpg"},
+  {name:"Edwin Hubble", years:"1889–1953", note:"Proved the universe is expanding and galaxies exist beyond the Milky Way.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Studio_portrait_photograph_of_Edwin_Powell_Hubble_%28cropped%29.JPG/800px-Studio_portrait_photograph_of_Edwin_Powell_Hubble_%28cropped%29.JPG"},
+  {name:"Carl Sagan", years:"1934–1996", note:"Visionary who popularized science and searched for extraterrestrial life.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Carl_Sagan_Planetary_Society.JPG/800px-Carl_Sagan_Planetary_Society.JPG"},
+  {name:"Stephen Hawking", years:"1942–2018", note:"Revolutionized black hole physics and cosmology.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Stephen_Hawking_050506.jpg/800px-Stephen_Hawking_050506.jpg"},
+  {name:"Vera Rubin", years:"1928–2016", note:"Provided the strongest evidence for dark matter.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Vera_Rubin.jpg/800px-Vera_Rubin.jpg"},
+  {name:"Cecilia Payne-Gaposchkin", years:"1900–1979", note:"Discovered that stars are mostly hydrogen and helium.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Cecilia_Helena_Payne-Gaposchkin_(1900-1979)_-_Science_Service.jpg/800px-Cecilia_Helena_Payne-Gaposchkin_(1900-1979)_-_Science_Service.jpg"},
+  {name:"Neil deGrasse Tyson", years:"1958–present", note:"World-renowned astrophysicist and science communicator.", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/2014_Neil_deGrasse_Tyson.jpg/800px-2014_Neil_deGrasse_Tyson.jpg"}
 ];
 
 // ====================== HELPERS ======================
@@ -299,36 +366,36 @@ function createStars(id, count) {
   const container = document.getElementById(id);
   for (let i = 0; i < count; i++) {
     const s = document.createElement('div');
-    const sz = Math.random() * 3.5 + 0.9;
+    const sz = Math.random() * 3.8 + 0.9;
     s.style.cssText = `position:absolute; background:#fff; border-radius:50%; width:${sz}px; height:${sz}px;
-      left:${Math.random()*100}vw; top:${Math.random()*100}vh; opacity:${Math.random()*0.8+0.3};
-      box-shadow:0 0 ${sz*3}px #fff; animation:twinkle ${Math.random()*6+4}s infinite alternate;`;
+      left:${Math.random()*100}vw; top:${Math.random()*100}vh; opacity:${Math.random()*0.85+0.3};
+      box-shadow:0 0 ${sz*3.5}px #fff; animation:twinkle ${Math.random()*7+4}s infinite alternate;`;
     container.appendChild(s);
   }
 }
 
-function createParticles(x, y, color = '#67e8f9', count = 55) {
+function createParticles(x, y, color = '#67e8f9', count = 70) {
   const container = document.getElementById('particles');
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
-    const size = Math.random() * 7 + 4;
+    const size = Math.random() * 8 + 4;
     p.style.cssText = `position:absolute; left:${x}px; top:${y}px; width:${size}px; height:${size}px;
-      background:${color}; border-radius:50%; pointer-events:none; box-shadow:0 0 15px ${color};`;
+      background:${color}; border-radius:50%; pointer-events:none; box-shadow:0 0 18px ${color};`;
     
     const angle = Math.random() * Math.PI * 2;
-    const vel = Math.random() * 220 + 100;
+    const vel = Math.random() * 260 + 120;
     
     p.animate([
       { transform: 'translate(0,0) scale(1)', opacity: 1 },
-      { transform: `translate(${Math.cos(angle)*vel}px, ${Math.sin(angle)*vel}px) scale(0.2)`, opacity: 0 }
-    ], { duration: Math.random() * 1100 + 900, easing: 'cubic-bezier(0.25,0.1,0.25,1)' });
+      { transform: `translate(${Math.cos(angle)*vel}px, ${Math.sin(angle)*vel}px) scale(0)`, opacity: 0 }
+    ], { duration: Math.random() * 1300 + 900, easing: 'cubic-bezier(0.25,0.1,0.25,1)' });
     
     container.appendChild(p);
-    setTimeout(() => p.remove(), 2500);
+    setTimeout(() => p.remove(), 2800);
   }
 }
 
-// ====================== PLANETS ======================
+// ====================== PLANETS & BLACK HOLE ======================
 function createPlanets() {
   const container = document.getElementById('planets');
   planetData.forEach(p => {
@@ -345,7 +412,7 @@ function createPlanets() {
       const cx = rect.left + rect.width/2;
       const cy = rect.top + rect.height/2;
 
-      createParticles(cx, cy, '#67e8f9', 65);
+      createParticles(cx, cy, '#67e8f9', 75);
       document.getElementById('burst').currentTime = 0;
       document.getElementById('burst').play().catch(()=>{});
 
@@ -357,31 +424,33 @@ function createPlanets() {
   });
 }
 
-// ====================== BLACK HOLE INTERACTION ======================
 document.getElementById('blackhole').addEventListener('click', (e) => {
   const rect = e.target.getBoundingClientRect();
   const cx = rect.left + rect.width/2;
   const cy = rect.top + rect.height/2;
   
-  createParticles(cx, cy, '#ffaa00', 90);
+  createParticles(cx, cy, '#ffaa00', 110);
   document.getElementById('burst').currentTime = 0;
   document.getElementById('burst').play().catch(()=>{});
   
-  alert("🌌 You have entered the singularity...\n\nThe universe thanks you for the journey, stardust.");
+  alert("🌌 SINGULARITY ENTERED\n\nYou have crossed the event horizon.\nThe universe is grateful for your journey, stardust.");
 });
 
-// ====================== MODALS ======================
-function closePlanetInfo() {
-  document.getElementById('planet-info').style.display = 'none';
-}
-
+// ====================== HALL OF LEGENDS ======================
 function openFamousModal() {
   const grid = document.getElementById('legends-grid');
   grid.innerHTML = '';
   legends.forEach(l => {
     const card = document.createElement('div');
     card.className = 'legend';
-    card.innerHTML = `<h3>${l.name}</h3><small>${l.years}</small><p>${l.note}</p>`;
+    card.innerHTML = `
+      <img src="${l.img}" alt="${l.name}">
+      <div class="info">
+        <h3>${l.name}</h3>
+        <small>${l.years}</small>
+        <p>${l.note}</p>
+      </div>
+    `;
     grid.appendChild(card);
   });
   document.getElementById('famous-modal').style.display = 'flex';
@@ -391,11 +460,15 @@ function closeFamousModal() {
   document.getElementById('famous-modal').style.display = 'none';
 }
 
+function closePlanetInfo() {
+  document.getElementById('planet-info').style.display = 'none';
+}
+
 // ====================== UNIVERSE CYCLE ======================
 let current = 1;
 const whoosh = document.getElementById('whoosh');
 const ambient = document.getElementById('ambient');
-ambient.volume = 0.25;
+ambient.volume = 0.28;
 
 document.addEventListener('click', (e) => {
   if (e.target.closest('.content') || 
@@ -405,7 +478,7 @@ document.addEventListener('click', (e) => {
       e.target.closest('.black-hole')) return;
 
   whoosh.currentTime = 0;
-  whoosh.volume = 0.45;
+  whoosh.volume = 0.48;
   whoosh.play().catch(()=>{});
 
   document.querySelector('.universe.active').classList.remove('active');
@@ -421,10 +494,10 @@ document.addEventListener('mousemove', e => {
 });
 
 // Init
-createStars('stars1', 360);
-createStars('stars2', 540);
-createStars('stars3', 200);
-createStars('stars4', 410);
+createStars('stars1', 380);
+createStars('stars2', 560);
+createStars('stars3', 210);
+createStars('stars4', 430);
 
 createPlanets();
 
@@ -436,15 +509,13 @@ document.addEventListener('keydown', e => {
     closePlanetInfo();
     closeFamousModal();
   }
-  if (e.key === " ") {
-    document.dispatchEvent(new Event('click'));
-  }
+  if (e.key === " ") document.dispatchEvent(new Event('click'));
 });
 </script>
 
 <style>
 @keyframes twinkle {
-  0% { opacity: 0.35; }
+  0% { opacity: 0.32; }
   100% { opacity: 1; }
 }
 </style>
